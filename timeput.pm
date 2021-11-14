@@ -30,7 +30,7 @@ timeput
     yes | head | timeput -d  | sed 's/ /T/' # POSIXの日時形式にしたい場合。このsed文は最初の空白文字のみTに変更。
     seq 5 | timeput -.6 | timeput -s.6| timeput -g.6
     seq 10 | timeput -! -w0.45 | timeput -g.3 # 0.45秒ずつ1行を読み取る。
-    command 1> output 2> >( timeput error.log ) # command は標準エラー出力に何か出力をするプログラムである。便利。
+    command 1> output.txt 2> >( timeput error.log ) # command は標準エラー出力に何か出力をするプログラムである。便利。
 
 =head1 AUTHOR
 
