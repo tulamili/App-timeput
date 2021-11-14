@@ -1,6 +1,6 @@
 package App::timeput ;  
-our $VERSION = '0.060' ; 
-our $DATE = '2021-11-13T21:21+09:00' ; 
+our $VERSION = '0.070' ; 
+our $DATE = '2021-11-14T17:06+09:00' ; 
 
 =encoding utf8
 =head1 NAME
@@ -9,30 +9,28 @@ App::timeput
 This module provides a Unix-like command `F<timeput>'. 
 =head1 DESCRIPTION
 
-=encoding utf8 
-
 =head1
 
- $0 
+timeput 
 
-  $0 は入力を可能な限り読取り、その各行の先頭に読み取った時刻の情報を
-  タブ区切りで出力する。
+  入力を1行ずつ読み、その各行の先頭に、読み取った時点の時刻をタブ区切りで出力する。
+  ただし、"-w 秒数" の指定により、1行読んで出力して、指定秒数動作を止める(sleepする)。
 
  オプション : 
-    -c STR : 色を指定する。0 で色無し。"cyan", "yellow", "faint red bold" "bright_blue" など Term::ANSIColor で使える色が使える。
-    -d : 日付(yyyy-mm-dd) を出力。
-    -s : $0 を起動してからの秒数を出力。
-    -. N : 秒数を小数点以下 N 桁出力する。1から6の整数値が使える。
-
-    -b : 開始からの秒数も、日時も同時に表示する。
-    -g : 開始からの秒数でなくて、1行ごとの間隔秒数を表示。-b と共に使う。(gap)
+    -c STR : 色の指定。0で色無し。"cyan","faint red bold","bright_blue"など。色名指定はTerm::ANSIColor を参照。
+    -d : 日付も出力。yyyy-mm-dd HH:MM:SS 形式で。(date)
+    -g : 開始からの秒数でなくて、1行ごとの間隔秒数を表示。(gap)
+    -s : 起動してからの秒数を出力。(start)
+    -w N: 入力から1行ずつ逐次読み取り出力して、N秒停止することを繰り返す。正の浮動小数点数を指定可能。(wait)
+    -. N : 秒数を小数点以下 N 桁出力する。1から6の整数値が使える。(-d とは両立しない。)
     -! : 出力のバッファリングをしない。
-
-
-  開発メモ : 
-
-    * -! に意味はあるのか? unbuffer コマンドの使い方も調べて検討したい。
-    * 上記の4個の問題が解決したら、英文のマニュアルも用意しよう。
+ 
+ 利用例 : 
+    yes | head | timeput -.6 
+    yes | head | timeput -d  | sed 's/ /T/' # POSIXの日時形式にしたい場合。このsed文は最初の空白文字のみTに変更。
+    seq 5 | timeput -.6 | timeput -s.6| timeput -g.6
+    seq 10 | timeput -! -w0.45 | timeput -g.3 # 0.45秒ずつ1行を読み取る。
+    command 1> output 2> >( timeput error.log ) # command は標準エラー出力に何か出力をするプログラムである。便利。
 
 =cut 
 
