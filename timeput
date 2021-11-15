@@ -6,22 +6,32 @@ use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
 use FindBin qw[ $Script ] ; 
 
 sub FB ($){FAINT BOLD $_[0]} 
-$SIG{INT} = sub { local $| = 1 ; say STDERR "Ctrl+\\", FB " or ", "Ctrl+¥", FB " to terminate `$Script'. " } ;
-$| = 1 if $o{'!'} ;
-if ( defined $o{w} ) { while (<>) { print $_ ; sleep $o{w} } ; exit } ; 
+sub Y ($){YELLOW $_[0]} 
 my ($t0s,$t0p) =  gettimeofday ; # 「起動した時刻」の記録。15マイクロ秒のオーバーヘッド
+$SIG{INT} = sub { local $| = 1 ; say STDERR Y "Ctrl+\\", FB " or ", Y "Ctrl+¥", FB " to terminate `$Script'. " } ;
+
+$| = 1 if $o{'!'} ;
+do { & proc_w ; exit } if defined $o{w} ; 
+
 my $dig = $o{'.'} if defined $o{'.'} ; # 桁数 (表示する秒の小数点以下の桁数)
 my $lay = 1e6 / 10 ** $dig if defined $dig ; # lay は英語の「置く」のつもり。
 my $HMS = '%02d:%02d:%02d' ; #　何度も使われる書式
+* gapproc = $o{g} ? sub (){ ($t0s, $t0p) = gettimeofday } : sub (){} ; # 50ナノ秒のオーバーヘッド。1回の実行につき。
 do { & main ; exit } ; 
+
+sub proc_w () { 
+  while ( <> ) {
+    do { my $s = "$o{w}" * $. - tv_interval( [$t0s,$t0p] , [gettimeofday] ) ; sleep $s > 0 ? $s : 0 } ; 
+    print $_ ; # print は 2 〜 5 ミリ秒動作に時間がかかる。
+  }
+}
 
 sub hhmmss0 () { sprintf $HMS , @{[localtime]}[2,1,0] }
 sub hhmmssD () { my($s,$m)=gettimeofday ; sprintf "$HMS.%0${dig}d",@{[localtime $s]}[2,1,0],int $m/$lay }
 sub ymdhms () { my @f=localtime;$f[4]+=1;$f[5]+=1900 ; sprintf "%02d-%02d-%02d $HMS" , @f[5,4,3,2,1,0] }
 sub secondsSince0 () { return sprintf "%0.0f" , time - $t0s } 
 sub secondsSinceD () { return sprintf "%0.${dig}f" , tv_interval [ $t0s, $t0p ] }
-sub gapproc () {} ; # 50ナノ秒のオーバーヘッド。1回の実行につき。
-* gapproc = $o{g} ? sub { ($t0s, $t0p) = ( gettimeofday ) } : sub { } ; 
+
 sub timenow () {
   my $t1 = $o{d} ? ymdhms : defined $dig ? hhmmssD : hhmmss0 ; 
   my $t2 = $dig ? secondsSinceD : secondsSince0 ; 
@@ -73,7 +83,10 @@ sub HELP_MESSAGE{
     yes | head | timeput -d  | sed 's/ /T/' # POSIXの日時形式にしたい場合。このsed文は最初の空白文字のみTに変更。
     seq 5 | timeput -.6 | timeput -s.6| timeput -g.6
     seq 10 | timeput -! -w0.45 | timeput -g.3 # 0.45秒ずつ1行を読み取る。
-    command 1> output.txt 2> >( timeput error.log ) # command は標準エラー出力に何か出力をするプログラムである。便利。
+    command 1> output1.txt 2> >( timeput error.log ) # command は標準エラー出力に何か出力をするプログラムである。便利。
+
+  開発メモ:
+    * -w の動作を高度化したい。-w 2,0.2x10,0 と指定することで最初は2秒、次に10回は0.2秒、残りは即座のように。,は+、xは*でも可としたい。
 
 =head1 AUTHOR
 

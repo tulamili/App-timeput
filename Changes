@@ -6,3 +6,4 @@ Revision history for the module "App::timeput"
 0.060  2021-11-13T21:28+09:00  This module is created by copyting the file from my own.
 0.070  2021-11-14T17:06+09:00 An option "-b" deleted. "-w" added. Ctrl+C behavior. Examples on the help page.
 0.071  2021-11-14T21:14+09:00 Wrote the author's name both in the program file and the .pm file.
+0.075  2021-11-15T00:00+09:00 Debugged "-w" part. Tuned precisely on "-g" part. Tiny revision on Manual.

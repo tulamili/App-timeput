@@ -1,6 +1,6 @@
 package App::timeput ;  
-our $VERSION = '0.071' ; 
-our $DATE = '2021-11-14T21:12+09:00' ; 
+our $VERSION = '0.075' ; 
+our $DATE = '2021-11-15T00:00+09:00' ; 
 
 =encoding utf8
 =head1 NAME
@@ -30,7 +30,10 @@ timeput
     yes | head | timeput -d  | sed 's/ /T/' # POSIXの日時形式にしたい場合。このsed文は最初の空白文字のみTに変更。
     seq 5 | timeput -.6 | timeput -s.6| timeput -g.6
     seq 10 | timeput -! -w0.45 | timeput -g.3 # 0.45秒ずつ1行を読み取る。
-    command 1> output.txt 2> >( timeput error.log ) # command は標準エラー出力に何か出力をするプログラムである。便利。
+    command 1> output1.txt 2> >( timeput error.log ) # command は標準エラー出力に何か出力をするプログラムである。便利。
+
+  開発メモ:
+    * -w の動作を高度化したい。-w 2,0.2x10,0 と指定することで最初は2秒、次に10回は0.2秒、残りは即座のように。,は+、xは*でも可としたい。
 
 =head1 AUTHOR
 
